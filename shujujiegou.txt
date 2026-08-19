@@ -4,4 +4,3 @@ int LocateELem(Sqlist L,ELemtype e){
          if (L.elem[i]==e) return i+1;
    return 0;
 }
-平均查找长度ASL
