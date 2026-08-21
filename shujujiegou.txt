@@ -23,3 +23,188 @@ Status ListInsert_Sq(Sqlist &L,int i,ElemType e){
        L.length++;//表长加一
        return OK;
 }
+示例
+#include <stdio.h>
+#define MAXSIZE 100     //顺序表数组最大存储空间
+#define OK 1            //函数执行成功标记
+#define ERROR 0         //函数执行失败标记
+
+typedef int ElemType;   //定义顺序表存储元素的数据类型
+typedef int Status;     //定义函数返回状态类型
+
+//顺序表结构体
+typedef struct{
+    ElemType elem[MAXSIZE]; //存放数据元素的数组
+    int length;             //顺序表当前实际元素个数
+}SqList;
+
+/**
+ * @brief 顺序表的插入函数
+ * @param L 顺序表指针
+ * @param i 插入的逻辑位置(从1开始计数)
+ * @param e 需要插入的元素
+ * @return Status OK插入成功，ERROR插入失败
+ */
+Status ListInsert_Sq(SqList *L,int i,ElemType e)
+{
+    int j;
+    //判断插入位置是否合法，i范围必须是 1~表长+1
+    if(i < 1 || i > L->length + 1)
+        return ERROR;
+    //判断顺序表存储空间已满
+    if(L->length == MAXSIZE)
+        return ERROR;
+    //从最后一个元素开始，向后依次移动元素，腾出插入位置
+    for(j = L->length - 1; j >= i-1; j--)
+    {
+        L->elem[j+1] = L->elem[j];
+    }
+    //把元素e放入腾出的空位，逻辑i对应数组下标i-1
+    L->elem[i-1] = e;
+    //表中元素总数+1
+    L->length++;
+    return OK;
+}
+
+int main()
+{
+    SqList L;
+    L.length=3;          //初始化当前顺序表有3个元素
+    L.elem[0]=11;       //存入第一个元素
+    L.elem[1]=22;       //存入第二个元素
+    L.elem[2]=33;       //存入第三个元素
+
+    //在第2号位置插入99
+    ListInsert_Sq(&L,2,99);
+
+    //循环遍历打印全部元素，检验插入结果
+    for(int i=0;i<L.length;i++)
+    {
+        printf("%d ",L.elem[i]);
+    }
+    return 0;
+}
+
+
+
+顺序表的删除
+最后
+中间
+最前
+1.判断合法
+2.将要删除的元素保存在e
+3.将第i+1到n位的元素依次向前移动
+4.表长减一
+Status ListDelete_Sq(Sqlist &L,int i){
+     if((i<1)||(i>L.length)) return ERROR;//判断合法
+     for(j=i;j<=L.length-1;j++)
+       L.elem[j-1]=L.elem[j];//前移
+     L.length--;//表长减一
+   return OK;  
+}
+示例
+#include <stdio.h>
+#include <stdlib.h>
+
+//函数状态码定义
+#define OK 0
+#define ERROR 1
+typedef int Status;
+
+//顺序表结构体定义
+typedef int ElemType;   //存放的数据类型，这里用int
+typedef struct{
+    ElemType *elem;     //动态数组，存放顺序表元素
+    int length;         //当前实际元素个数
+    int listsize;       //已经分配好的总容量
+}SqList;
+
+/**
+ * @brief 初始化空的顺序表
+ * @param L 顺序表指针
+ * @return Status OK成功，ERROR失败
+ */
+Status InitList_Sq(SqList *L)
+{
+    //初始分配10个元素空间
+    L->elem = (ElemType *)malloc(10 * sizeof(ElemType));
+    if(!L->elem)   //内存分配失败
+        return ERROR;
+    L->length = 0;      //初始元素个数为0
+    L->listsize = 10;   //初始总容量10
+    return OK;
+}
+
+/**
+ * @brief 顺序表删除函数  对应老师给的函数
+ * @param L 顺序表指针
+ * @param i 要删除元素的【位序】，从1开始！！不是数组下标
+ * @return Status OK删除成功；ERROR删除失败(位置非法)
+ */
+Status ListDelete_Sq(SqList *L,int i)
+{
+    int j;
+    //第一步：判断i是否合法
+    //合法范围：1 <= i <= 当前表长L->length
+    if((i < 1) || (i > L->length))
+    {
+        return ERROR;
+    }
+
+    //第二步：被删位置后面所有元素整体向前移动一位，覆盖掉被删除元素
+    //j代表【位序】，从被删元素的下一个位置开始移动
+    //j <= L->length-1：循环到最后一个元素的位序
+    for(j = i ; j <= L->length - 1 ; j++)
+    {
+        //位序j →数组下标 j‑1
+        //把后面一个元素赋值给前面一个位置
+        L->elem[j-1] = L->elem[j];
+    }
+
+    //第三步：有效元素长度-1
+    L->length--;
+
+    return OK;
+}
+
+//打印整个顺序表
+void PrintList(SqList *L)
+{
+    int k;
+    printf("顺序表当前元素：");
+    for(k = 0 ; k < L->length ; k++)
+    {
+        printf("%d ",L->elem[k]);
+    }
+    printf("\n");
+}
+
+int main()
+{
+    SqList L;
+    int i,del_pos,ret;
+
+    //1、初始化顺序表
+    InitList_Sq(&L);
+
+    //手动往顺序表里放5个测试元素 11 22 33 44 55
+    L.elem[0]=11;
+    L.elem[1]=22;
+    L.elem[2]=33;
+    L.elem[3]=44;
+    L.elem[4]=55;
+    L.length = 5;
+
+    printf("====删除前====\n");
+    PrintList(&L);
+
+    //输入要删除的位序(从1开始)
+    printf("请输入需要删除第几个元素(位序):");
+    scanf("%d",&del_pos);
+
+    //调用删除函数
+    ret = ListDelete_Sq(&L,del_pos);
+    if(ret == ERROR)
+    {
+        printf("删除失败！位置%d不合法\n",del_pos);
+    }
