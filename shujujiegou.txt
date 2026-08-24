@@ -208,3 +208,14 @@ int main()
     {
         printf("删除失败！位置%d不合法\n",del_pos);
     }
+    else
+    {
+        printf("====删除成功后====\n");
+        PrintList(&L);
+    }
+
+    //释放动态内存，防止内存泄漏
+    free(L.elem);
+    L.elem = NULL;
+    return 0;
+}
